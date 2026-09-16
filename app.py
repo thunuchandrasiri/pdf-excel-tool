@@ -30,16 +30,16 @@ if uploaded_file and api_key:
                 if uploaded_file.type == "application/pdf":
                     reader = PdfReader(uploaded_file)
                     text = "".join([page.extract_text() for page in reader.pages if page.extract_text()])
-                    response = client.models.generate_content(
-                        model="gemini-2.5-flash",
-                        contents=f"{prompt}\n\nInvoice Content:\n{text}"
+                   response = client.models.generate_content(
+    model="gemini-3.6-flash",
+    contents=f"{prompt}\n\nInvoice Content:\n{text}"
                     )
                 else:
                     image = Image.open(uploaded_file)
-                    response = client.models.generate_content(
-                        model="gemini-2.5-flash",
-                        contents=[image, prompt]
-                    )
+                   response = client.models.generate_content(
+    model="gemini-3.6-flash",
+    contents=[image, prompt]
+)
 
                 clean_json = response.text.strip().replace("```json", "").replace("```", "")
                 data = json.loads(clean_json)
