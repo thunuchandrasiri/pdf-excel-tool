@@ -8,7 +8,7 @@ from pypdf import PdfReader
 st.set_page_config(page_title="PDF Invoice to Excel", layout="wide")
 st.title("🧾 SME Invoice & Receipt to Excel Converter")
 
-# Streamlit Secrets වලින් auto API Key එක ගැනීම හෝ Sidebar Input එක
+# Streamlit Secrets වලින් auto API Key එක ගැනීම හෝ Sidebar එකෙන් Input කිරීම
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
@@ -30,24 +30,24 @@ if uploaded_file and api_key:
                 if uploaded_file.type == "application/pdf":
                     reader = PdfReader(uploaded_file)
                     text = "".join([page.extract_text() for page in reader.pages if page.extract_text()])
-                   response = client.models.generate_content(
-    model="gemini-3.6-flash",
-    contents=f"{prompt}\n\nInvoice Content:\n{text}"
+                    response = client.models.generate_content(
+                        model="gemini-3.6-flash",
+                        contents=f"{prompt}\n\nInvoice Content:\n{text}"
                     )
                 else:
                     image = Image.open(uploaded_file)
-                   response = client.models.generate_content(
-    model="gemini-3.6-flash",
-    contents=[image, prompt]
-)
+                    response = client.models.generate_content(
+                        model="gemini-3.6-flash",
+                        contents=[image, prompt]
+                    )
 
                 clean_json = response.text.strip().replace("```json", "").replace("```", "")
                 data = json.loads(clean_json)
                 df = pd.DataFrame([data])
-
+                
                 st.success("Extraction Complete!")
                 st.dataframe(df)
-
+                
                 csv_data = df.to_csv(index=False).encode('utf-8')
                 st.download_button("📥 Download Excel/CSV", csv_data, "invoice.csv", "text/csv")
 
